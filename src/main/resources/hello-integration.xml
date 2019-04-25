@@ -19,5 +19,20 @@
         <int:method name="sayHello" request-channel="helloRequestChannel" reply-channel="helloReplyChannel"/>
     </int:gateway>
 
+    <int-http:outbound-gateway request-channel="helloRequestChannel"
+                               reply-channel="helloReplyChannel"
+                               url="http://localhost:8080/sayHello"
+                               http-method="POST"
+                               rest-template="myRestTemplate"/>
+
+    <bean id="mappingJackson2HttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+    <bean id="myRestTemplate" class="org.springframework.web.client.RestTemplate">
+        <property name="messageConverters">
+            <list>
+                <ref bean="mappingJackson2HttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
 
 </beans>
