@@ -19,12 +19,17 @@
         <int:method name="sayHello" request-channel="helloRequestChannel" reply-channel="helloReplyChannel"/>
     </int:gateway>
 
-    <int-http:outbound-gateway request-channel="helloRequestChannel"
-                               reply-channel="helloReplyChannel"
-                               url="http://localhost:8080/sayHello"
-                               http-method="POST"
-                               rest-template="myRestTemplate">
-    </int-http:outbound-gateway>
+    <int:chain input-channel="helloRequestChannel" output-channel="helloReplyChannel">
+        <int:header-enricher>
+            <int:header name="Content-Type" value="application/json"/>
+        </int:header-enricher>
+        <int-http:outbound-gateway url="http://localhost:8080/sayHello"
+                                   http-method="POST"
+                                   rest-template="myRestTemplate"
+        expected-response-type="pl.bgora.rest.SayHelloResponse">
+        </int-http:outbound-gateway>    
+    </int:chain>
+    
 
     <bean id="mappingJackson2HttpMessageConverter "
           class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter ">
