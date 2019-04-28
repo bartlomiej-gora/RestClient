@@ -14,8 +14,9 @@
 
     <int:channel id="helloRequestChannel"/>
     <int:channel id="helloReplyChannel"/>
+    <int:channel id="errorChannel"/>
 
-    <int:gateway id="helloGateway" service-interface="pl.bgora.rest.HelloGateway">
+    <int:gateway id="helloGateway" service-interface="pl.bgora.rest.HelloGateway" error-channel="errorChannel">
         <int:method name="sayHello" request-channel="helloRequestChannel" reply-channel="helloReplyChannel"/>
     </int:gateway>
 
@@ -26,10 +27,10 @@
         <int-http:outbound-gateway url="http://localhost:8080/sayHello"
                                    http-method="POST"
                                    rest-template="myRestTemplate"
-        expected-response-type="pl.bgora.rest.SayHelloResponse">
-        </int-http:outbound-gateway>    
+                                   expected-response-type="pl.bgora.rest.SayHelloResponse">
+        </int-http:outbound-gateway>
     </int:chain>
-    
+
 
     <bean id="mappingJackson2HttpMessageConverter "
           class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter ">
@@ -45,7 +46,9 @@
                 <ref bean="mappingJackson2HttpMessageConverter "/>
             </list>
         </property>
-
     </bean>
+
+    <int:service-activator input-channel="errorChannel" ref="sayHelloErrorHandler"/>
+    <bean id="sayHelloErrorHandler" class="pl.bgora.rest.SayHelloErrorHandler"/>
 
 </beans>
